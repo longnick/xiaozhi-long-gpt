@@ -4,8 +4,7 @@ on: { workflow_dispatch: {} }
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Dùng Docker image chính thức đã có ESP-IDF v5.2 sẵn
-    container: espressif/idf:release-v5.2
+    container: espressif/idf:release-v5.2   # có sẵn toolchain + esptool.py
 
     steps:
       - uses: actions/checkout@v4
@@ -18,16 +17,29 @@ jobs:
           sed -i "s|CONFIG_XIAOZHI_OPENAI_KEY=.*|CONFIG_XIAOZHI_OPENAI_KEY=\"${{ secrets.OPENAI_API_KEY }}\"|g" sdkconfig.defaults || true
           sed -i "s|CONFIG_XIAOZHI_OWM_KEY=.*|CONFIG_XIAOZHI_OWM_KEY=\"${{ secrets.OWM_API_KEY }}\"|g" sdkconfig.defaults || true
 
-      - name: Build (esp32s3)
-        env:
-          IDF_PYTHON_ENV_PATH: /opt/esp/python_env/idf5.2_py3.8_env  # có sẵn trong image
+      # ✅ Quan trọng: cài Python env chuẩn cho ESP-IDF (đừng set IDF_PYTHON_ENV_PATH)
+      - name: Setup ESP-IDF environment
+        shell: bash
         run: |
+          set -e
+          . /opt/esp/idf/export.sh
+          # Cài python env đúng theo version của IDF trong image
+          idf_tools.py install-python-env
+          python3 -m pip install -r $IDF_PATH/requirements.txt
+          idf.py --version
+
+      - name: Build (esp32s3)
+        shell: bash
+        run: |
+          set -e
           . /opt/esp/idf/export.sh
           idf.py set-target esp32s3
           idf.py build
 
       - name: Create merged.bin
+        shell: bash
         run: |
+          set -e
           . /opt/esp/idf/export.sh
           mkdir -p artifacts
           esptool.py --chip esp32s3 merge_bin -o artifacts/merged.bin \
