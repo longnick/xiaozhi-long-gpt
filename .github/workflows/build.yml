@@ -30,4 +30,16 @@ jobs:
         run: |
           . /opt/esp/idf/export.sh
           mkdir -p artifacts
-          esptool.py --chip esp32s3 merge_bin -o ar_
+          esptool.py --chip esp32s3 merge_bin -o artifacts/merged.bin \
+            0x0000  build/bootloader/bootloader.bin \
+            0x8000  build/partition_table/partition-table.bin \
+            0x10000 build/xiaozhi_long_gpt.bin
+          cp build/bootloader/bootloader.bin artifacts/
+          cp build/partition_table/partition-table.bin artifacts/
+          cp build/xiaozhi_long_gpt.bin artifacts/app.bin
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: long-gpt-esp32s3
+          path: artifacts/*
