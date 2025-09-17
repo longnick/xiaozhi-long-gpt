@@ -4,12 +4,12 @@ on: { workflow_dispatch: {} }
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: espressif/idf:release-v5.2   # có sẵn toolchain + esptool.py
+    container: espressif/idf:release-v5.2
 
     steps:
       - uses: actions/checkout@v4
 
-      # (Tuỳ chọn) bơm secrets vào sdkconfig.defaults
+      # (tuỳ chọn) bơm secrets vào sdkconfig.defaults
       - name: Inject secrets into sdkconfig.defaults
         run: |
           sed -i "s|CONFIG_XIAOZHI_WIFI_SSID=.*|CONFIG_XIAOZHI_WIFI_SSID=\"${{ secrets.WIFI_SSID }}\"|g" sdkconfig.defaults || true
@@ -17,16 +17,15 @@ jobs:
           sed -i "s|CONFIG_XIAOZHI_OPENAI_KEY=.*|CONFIG_XIAOZHI_OPENAI_KEY=\"${{ secrets.OPENAI_API_KEY }}\"|g" sdkconfig.defaults || true
           sed -i "s|CONFIG_XIAOZHI_OWM_KEY=.*|CONFIG_XIAOZHI_OWM_KEY=\"${{ secrets.OWM_API_KEY }}\"|g" sdkconfig.defaults || true
 
-      # ✅ Quan trọng: cài Python env chuẩn cho ESP-IDF (đừng set IDF_PYTHON_ENV_PATH)
-      - name: Setup ESP-IDF environment
+      # ✅ CÀI tool + python env TRƯỚC, rồi mới export
+      - name: Install ESP-IDF tools & python env
         shell: bash
         run: |
           set -e
+          /opt/esp/idf/install.sh
           . /opt/esp/idf/export.sh
-          # Cài python env đúng theo version của IDF trong image
-          idf_tools.py install-python-env
-          python3 -m pip install -r $IDF_PATH/requirements.txt
           idf.py --version
+          python3 -V
 
       - name: Build (esp32s3)
         shell: bash
