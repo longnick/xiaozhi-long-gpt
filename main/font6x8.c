@@ -1,4 +1,4 @@
-/* Minimal 6x8 ASCII font (32..126). For brevity, only a subset shown. Replace with a full table if needed. */
+Minimal 6x8 ASCII font (32..126). For brevity, only a subset shown. Replace with a full table if needed. */
 #include <stdint.h>
 #include "font6x8.h"
 
@@ -17,4 +17,3 @@ const uint8_t g_font6x8[96][6] = {
   {0x24,0x2A,0x7F,0x2A,0x12,0x00},
   // ... (please replace with a full 6x8 font table for production)
 };
-*/
