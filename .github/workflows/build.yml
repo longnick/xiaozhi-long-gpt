@@ -4,15 +4,14 @@ on: { workflow_dispatch: {} }
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Dùng Docker image chính thức đã có ESP-IDF v5.2 sẵn
+    container: espressif/idf:release-v5.2
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up ESP-IDF
-        uses: espressif/setup-esp-idf@v1
-        with:
-          version: v5.2
-
-      - name: Configure secrets into sdkconfig.defaults (optional)
+      # (Tuỳ chọn) bơm secrets vào sdkconfig.defaults
+      - name: Inject secrets into sdkconfig.defaults
         run: |
           sed -i "s|CONFIG_XIAOZHI_WIFI_SSID=.*|CONFIG_XIAOZHI_WIFI_SSID=\"${{ secrets.WIFI_SSID }}\"|g" sdkconfig.defaults || true
           sed -i "s|CONFIG_XIAOZHI_WIFI_PASS=.*|CONFIG_XIAOZHI_WIFI_PASS=\"${{ secrets.WIFI_PASSWORD }}\"|g" sdkconfig.defaults || true
@@ -20,23 +19,15 @@ jobs:
           sed -i "s|CONFIG_XIAOZHI_OWM_KEY=.*|CONFIG_XIAOZHI_OWM_KEY=\"${{ secrets.OWM_API_KEY }}\"|g" sdkconfig.defaults || true
 
       - name: Build (esp32s3)
+        env:
+          IDF_PYTHON_ENV_PATH: /opt/esp/python_env/idf5.2_py3.8_env  # có sẵn trong image
         run: |
+          . /opt/esp/idf/export.sh
           idf.py set-target esp32s3
           idf.py build
 
-      - name: Make merged.bin
+      - name: Create merged.bin
         run: |
+          . /opt/esp/idf/export.sh
           mkdir -p artifacts
-          esptool.py --chip esp32s3 merge_bin -o artifacts/merged.bin \
-            0x0000  build/bootloader/bootloader.bin \
-            0x8000  build/partition_table/partition-table.bin \
-            0x10000 build/xiaozhi_long_gpt.bin
-          cp build/bootloader/bootloader.bin artifacts/
-          cp build/partition_table/partition-table.bin artifacts/
-          cp build/xiaozhi_long_gpt.bin artifacts/app.bin
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: long-gpt-esp32s3
-          path: artifacts/*
+          esptool.py --chip esp32s3 merge_bin -o ar_
