@@ -1,1 +1,44 @@
+/*
+menu "XiaoZhi LONG GPT"
+    config XIAOZHI_WIFI_SSID
+        string "WiFi SSID"
+        default "YourWiFi"
+    config XIAOZHI_WIFI_PASS
+        string "WiFi Password"
+        default "YourPassword"
+    config XIAOZHI_OPENAI_KEY
+        string "OpenAI API Key"
+        default "sk-xxxxx"
+    config XIAOZHI_OPENAI_MODEL
+        string "OpenAI Chat Model"
+        default "gpt-4o-mini"
+    config XIAOZHI_OWM_KEY
+        string "OpenWeather API Key (optional)"
+        default ""
+    config XIAOZHI_CITY
+        string "City"
+        default "Bao Loc"
+    config XIAOZHI_COUNTRY
+        string "Country Code"
+        default "VN"
+    config XIAOZHI_LCD_SCK
+        int "LCD SCK"
+        default 12
+    config XIAOZHI_LCD_MOSI
+        int "LCD MOSI"
+        default 11
+    config XIAOZHI_LCD_DC
+        int "LCD DC"
+        default 9
+    config XIAOZHI_LCD_CS
+        int "LCD CS"
+        default 10
+    config XIAOZHI_LCD_RST
+        int "LCD RST"
+        default 8
+    config XIAOZHI_LCD_BL
+        int "LCD BL (PWM)"
+        default 14
+endmenu
+*/
 
