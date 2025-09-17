@@ -17,7 +17,46 @@
 
 #define TAG "LONGGPT"
 
-// Kconfig
+#ifndef CONFIG_XIAOZHI_WIFI_SSID
+#define CONFIG_XIAOZHI_WIFI_SSID "YourWiFi"
+#endif
+#ifndef CONFIG_XIAOZHI_WIFI_PASS
+#define CONFIG_XIAOZHI_WIFI_PASS "YourPassword"
+#endif
+#ifndef CONFIG_XIAOZHI_OPENAI_KEY
+#define CONFIG_XIAOZHI_OPENAI_KEY "sk-xxxxx"
+#endif
+#ifndef CONFIG_XIAOZHI_OPENAI_MODEL
+#define CONFIG_XIAOZHI_OPENAI_MODEL "gpt-4o-mini"
+#endif
+#ifndef CONFIG_XIAOZHI_OWM_KEY
+#define CONFIG_XIAOZHI_OWM_KEY ""
+#endif
+#ifndef CONFIG_XIAOZHI_CITY
+#define CONFIG_XIAOZHI_CITY "Bao Loc"
+#endif
+#ifndef CONFIG_XIAOZHI_COUNTRY
+#define CONFIG_XIAOZHI_COUNTRY "VN"
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_SCK
+#define CONFIG_XIAOZHI_LCD_SCK 12
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_MOSI
+#define CONFIG_XIAOZHI_LCD_MOSI 11
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_DC
+#define CONFIG_XIAOZHI_LCD_DC 9
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_CS
+#define CONFIG_XIAOZHI_LCD_CS 10
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_RST
+#define CONFIG_XIAOZHI_LCD_RST 8
+#endif
+#ifndef CONFIG_XIAOZHI_LCD_BL
+#define CONFIG_XIAOZHI_LCD_BL 14
+#endif
+
 #define WIFI_SSID        CONFIG_XIAOZHI_WIFI_SSID
 #define WIFI_PASS        CONFIG_XIAOZHI_WIFI_PASS
 #define OPENAI_API_KEY   CONFIG_XIAOZHI_OPENAI_KEY
@@ -36,7 +75,7 @@
 #define LCD_W 240
 #define LCD_H 240
 
-// Conversation memory
+
 typedef struct { char role[12]; char content[384]; } turn_t;
 #define MAX_TURNS 10
 static turn_t history[MAX_TURNS*2];
@@ -52,7 +91,7 @@ static void push_turn(const char *role, const char *content){
     xSemaphoreGive(hist_mux);
 }
 
-// WiFi
+
 static void wifi_start(void)
 {
     ESP_ERROR_CHECK(esp_netif_init());
@@ -73,7 +112,7 @@ static void wifi_start(void)
     ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
-// SNTP
+
 static void time_sync_notification_cb(struct timeval *tv){ ESP_LOGI(TAG, "Time synced"); }
 static void sntp_start(void)
 {
@@ -84,7 +123,7 @@ static void sntp_start(void)
     sntp_init();
 }
 
-// Simple HTTP helpers
+
 static esp_err_t http_get_to_buf(const char *url, char *buf, size_t buflen)
 {
     esp_http_client_config_t cfg = {
