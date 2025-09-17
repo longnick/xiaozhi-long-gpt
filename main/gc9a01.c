@@ -1,9 +1,10 @@
 Minimal GC9A01 panel driver using esp_lcd (SPI). Provides init + a few draw helpers. */
 #include <string.h>
 #include "driver/spi_master.h"
-#include "esp_lcd_panel_interface.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_io_spi.h"
 #include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_vendor.h"
+#include "esp_lcd_gc9a01.h"
 #include "esp_err.h"
 #include "driver/gpio.h"
 #include "gc9a01.h"
@@ -34,7 +35,7 @@ esp_err_t gc9a01_init(int sck, int mosi, int dc, int cs, int rst, int bl)
     };
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
-    esp_lcd_panel_io_spi_config_t io_config = {
+        esp_lcd_panel_io_spi_config_t io_config = {
         .dc_gpio_num = dc,
         .cs_gpio_num = cs,
         .pclk_hz = 40 * 1000 * 1000,
@@ -43,12 +44,14 @@ esp_err_t gc9a01_init(int sck, int mosi, int dc, int cs, int rst, int bl)
         .spi_mode = 0,
         .trans_queue_depth = 10,
     };
-    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SPI2_HOST, &io_config, &s_io));
+    // IDF v5.2: truyền SPI host id trực tiếp
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(SPI2_HOST, &io_config, &s_io));
 
-    esp_lcd_panel_dev_config_t panel_config = {
+        esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = rst,
         .rgb_endian = LCD_RGB_ENDIAN_BGR,
         .bits_per_pixel = 16,
+        .vendor_config = NULL,
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(s_io, &panel_config, &s_panel));
     esp_lcd_panel_reset(s_panel);
