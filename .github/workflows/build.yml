@@ -9,7 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # (tuỳ chọn) bơm secrets vào sdkconfig.defaults
       - name: Inject secrets into sdkconfig.defaults
         run: |
           sed -i "s|CONFIG_XIAOZHI_WIFI_SSID=.*|CONFIG_XIAOZHI_WIFI_SSID=\"${{ secrets.WIFI_SSID }}\"|g" sdkconfig.defaults || true
@@ -17,7 +16,6 @@ jobs:
           sed -i "s|CONFIG_XIAOZHI_OPENAI_KEY=.*|CONFIG_XIAOZHI_OPENAI_KEY=\"${{ secrets.OPENAI_API_KEY }}\"|g" sdkconfig.defaults || true
           sed -i "s|CONFIG_XIAOZHI_OWM_KEY=.*|CONFIG_XIAOZHI_OWM_KEY=\"${{ secrets.OWM_API_KEY }}\"|g" sdkconfig.defaults || true
 
-      # ✅ CÀI tool + python env TRƯỚC, rồi mới export
       - name: Install ESP-IDF tools & python env
         shell: bash
         run: |
@@ -27,13 +25,15 @@ jobs:
           idf.py --version
           python3 -V
 
+      - name: Clean build dir
+        run: rm -rf build
+
       - name: Build (esp32s3)
-        shell: bash
         run: |
-          set -e
           . /opt/esp/idf/export.sh
           idf.py set-target esp32s3
           idf.py build
+
 
       - name: Create merged.bin
         shell: bash
