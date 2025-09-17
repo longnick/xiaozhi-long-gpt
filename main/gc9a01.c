@@ -33,18 +33,27 @@ esp_err_t gc9a01_init(int sck, int mosi, int dc, int cs, int rst, int bl)
         .quadhd_io_num = -1,
         .max_transfer_sz = LCD_W * 40 * 2
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
+ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO));
 
-        esp_lcd_panel_io_spi_config_t io_config = {
-        .dc_gpio_num = dc,
-        .cs_gpio_num = cs,
-        .pclk_hz = 40 * 1000 * 1000,
-        .lcd_cmd_bits = 8,
-        .lcd_param_bits = 8,
-        .spi_mode = 0,
-        .trans_queue_depth = 10,
-    };
-    // IDF v5.2: truyền SPI host id trực tiếp
+esp_lcd_panel_io_spi_config_t io_config = {
+    .dc_gpio_num = dc,
+    .cs_gpio_num = cs,
+    .pclk_hz = 40 * 1000 * 1000,
+    .lcd_cmd_bits = 8,
+    .lcd_param_bits = 8,
+    .spi_mode = 0,
+    .trans_queue_depth = 10,
+};
+ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(SPI2_HOST, &io_config, &s_io));
+
+esp_lcd_panel_dev_config_t panel_config = {
+    .reset_gpio_num = rst,
+    .rgb_endian = LCD_RGB_ENDIAN_BGR,
+    .bits_per_pixel = 16,
+    .vendor_config = NULL,
+};
+ESP_ERROR_CHECK(esp_lcd_new_panel_gc9a01(s_io, &panel_config, &s_panel));
+
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(SPI2_HOST, &io_config, &s_io));
 
         esp_lcd_panel_dev_config_t panel_config = {
