@@ -1,4 +1,4 @@
-/* Minimal GC9A01 panel driver using esp_lcd (SPI). Provides init + a few draw helpers. */
+Minimal GC9A01 panel driver using esp_lcd (SPI). Provides init + a few draw helpers. */
 #include <string.h>
 #include "driver/spi_master.h"
 #include "esp_lcd_panel_interface.h"
