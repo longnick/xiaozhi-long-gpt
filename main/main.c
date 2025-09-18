@@ -115,20 +115,17 @@ static void wifi_start(void)
 
 
 static void time_sync_notification_cb(struct timeval *tv){ ESP_LOGI(TAG, "Time synced"); }
+
 static void sntp_start(void)
 {
-    setenv("TZ", "ICT-7", 1); tzset(); // GMT+7
+    setenv("TZ", "ICT-7", 1); 
+    tzset(); // GMT+7
 
-esp_sntp_config_t sntp_cfg = ESP_SNTP_CONFIG_DEFAULT();
-sntp_cfg.server_from_dhcp = false;
-sntp_cfg.start = true;
-sntp_cfg.smooth_sync = false;
-sntp_cfg.sync_cb = time_sync_notification_cb;
-
-// đặt server thủ công (vd: pool.ntp.org)
-esp_sntp_setservername(0, "pool.ntp.org");
-
-esp_sntp_init(&sntp_cfg);
+    // Dùng API có tiền tố esp_ để tránh deprecated
+    esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
+    esp_sntp_setservername(0, "pool.ntp.org");
+    esp_sntp_set_time_sync_notification_cb(time_sync_notification_cb);
+    esp_sntp_init(); // <- KHÔNG có tham số
 }
 
 
