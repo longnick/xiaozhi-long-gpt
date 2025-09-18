@@ -118,10 +118,17 @@ static void time_sync_notification_cb(struct timeval *tv){ ESP_LOGI(TAG, "Time s
 static void sntp_start(void)
 {
     setenv("TZ", "ICT-7", 1); tzset(); // GMT+7
-    sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    sntp_setservername(0, "pool.ntp.org");
-    sntp_set_time_sync_notification_cb(time_sync_notification_cb);
-    sntp_init();
+
+esp_sntp_config_t sntp_cfg = ESP_SNTP_CONFIG_DEFAULT();
+sntp_cfg.server_from_dhcp = false;
+sntp_cfg.start = true;
+sntp_cfg.smooth_sync = false;
+sntp_cfg.sync_cb = time_sync_notification_cb;
+
+// đặt server thủ công (vd: pool.ntp.org)
+esp_sntp_setservername(0, "pool.ntp.org");
+
+esp_sntp_init(&sntp_cfg);
 }
 
 
